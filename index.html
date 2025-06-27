@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat App</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; margin: 0; padding: 0; }
+    #chat { width: 90%; max-width: 600px; margin: 40px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+    ul { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; margin-bottom: 10px; }
+    li { background: #e6f7ff; margin-bottom: 6px; padding: 10px; border-radius: 5px; }
+    input { width: 75%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    button { padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <h2>💬 Real-Time Chat</h2>
+    <ul id="messages"></ul>
+    <input id="msgInput" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const messages = document.getElementById('messages');
+
+    function sendMessage() {
+      const msg = msgInput.value.trim();
+      if (msg !== '') {
+        socket.emit('chat message', msg);
+        msgInput.value = '';
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    msgInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    socket.on('chat message', function(msg) {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    });
+  </script>
+</body>
+</html>
